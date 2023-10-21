@@ -7,16 +7,22 @@ export const AddTask = () => {
   const dispatch = useDispatch();
   const [task, setTask] = useState('');
   const saveRef = useRef<HTMLButtonElement>(null);
+  const [valueSelect, setValueSelect] = useState('regular');
 
   const handleSubmit = (e: React.ChangeEvent<EventTarget>) => {
     e.preventDefault();
-    dispatch(addTodo(task));
+    dispatch(addTodo({task, importance: valueSelect}));
     setTask('');
+    setValueSelect('regular');
   };
 
   const handleChange = (e: React.ChangeEvent<EventTarget>) => {
     if (e.target instanceof HTMLInputElement) {
       setTask(e.target.value);
+    }
+    if(e.target instanceof HTMLSelectElement){
+      setValueSelect(e.target.value);
+      console.log(e.target.value);
     }
   };
 
@@ -41,6 +47,17 @@ export const AddTask = () => {
           placeholder="ввести задачу"
         />
       </Form.Label>
+      <Form.Select
+        className="me-3"
+        aria-label="Важность задачи"
+        style={{width: '125px'}}
+        value={valueSelect}
+        onChange={handleChange}
+      >
+        <option value="regular">обычная</option>
+        <option value="important">важная</option>
+        <option value="urgent">срочная</option>
+      </Form.Select>
       <Button
         className="btn btn-primary me-3"
         type="submit"
@@ -55,6 +72,7 @@ export const AddTask = () => {
         onClick={(e: React.ChangeEvent<EventTarget>) => {
           e.preventDefault();
           setTask('');
+          setValueSelect('regular');
         }}
       >
         Очистить

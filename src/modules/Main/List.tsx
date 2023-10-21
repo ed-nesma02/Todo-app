@@ -6,11 +6,11 @@ export const List = () => {
   const {todoList} = useAppSelector((state) => state.tasks);
 
   return (
-    <div className="table-wrapper">
+    <div className="table-wrapper" style={{overflowY: 'auto'}}>
       {!!todoList.length && (
         <Table className="table table-hover table-bordered">
           <thead>
-            <tr key='headtr'>
+            <tr key="headtr">
               <th>№</th>
               <th>Задача</th>
               <th>Статус</th>

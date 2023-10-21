@@ -11,7 +11,7 @@ import {ConfirmModal} from '../ConfirmModal/ConfirmModal';
 
 type Props = ITask & {index: number};
 
-export const Task = ({task, complete, id, index}: Props) => {
+export const Task = ({task, complete, id, index, importance}: Props) => {
   const dispatch = useDispatch();
   const editBtn = useRef<HTMLButtonElement>(null);
   const [edit, setEdit] = useState(false);
@@ -34,7 +34,6 @@ export const Task = ({task, complete, id, index}: Props) => {
     }
   }, [deleteTask, dispatch, id]);
 
-
   useEffect(() => {
     if (editBtn.current instanceof HTMLButtonElement) {
       if (!taskValue) {
@@ -47,7 +46,19 @@ export const Task = ({task, complete, id, index}: Props) => {
 
   return (
     <>
-      <tr className={complete ? 'table-success' : "table-light"}>
+      <tr
+        className={
+          complete
+            ? 'table-info'
+            : importance === 'urgent'
+            ? 'table-danger'
+            : importance === 'important'
+            ? 'table-warning'
+            : importance === 'regular'
+            ? 'table-success'
+            : 'table-light'
+        }
+      >
         <td>{index}</td>
         {!edit ? (
           <td className={complete ? 'text-decoration-line-through' : 'task'}>
@@ -98,7 +109,12 @@ export const Task = ({task, complete, id, index}: Props) => {
           </Button>
         </td>
       </tr>
-      {confirmModal && <ConfirmModal setConfirmModal={setConfirmModal} setDeleteTask={setDeleteTask} />}
+      {confirmModal && (
+        <ConfirmModal
+          setConfirmModal={setConfirmModal}
+          setDeleteTask={setDeleteTask}
+        />
+      )}
     </>
   );
 };

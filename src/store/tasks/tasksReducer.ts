@@ -4,6 +4,7 @@ export interface ITask {
   id: string;
   complete: boolean;
   task: string;
+  importance: string;
 }
 
 const initialState: {
@@ -26,7 +27,8 @@ const tasksSlice = createSlice({
       state.todoList.push({
         id: Math.random().toString(16).substring(2, 10),
         complete: false,
-        task: action.payload,
+        task: action.payload.task,
+        importance: action.payload.importance,
       });
     },
     removeTodo(state, action) {
