@@ -1,62 +1,104 @@
-import {Button} from 'react-bootstrap';
-import {ITask, completeTodo, removeTodo} from '../../store/tasks/tasksReducer';
+import {Button, Form, InputGroup} from 'react-bootstrap';
+import {
+  ITask,
+  completeTodo,
+  editTodo,
+  removeTodo,
+} from '../../store/tasks/tasksReducer';
 import {useDispatch} from 'react-redux';
-import {useEffect, useRef} from 'react';
+import {useEffect, useRef, useState} from 'react';
+import {ConfirmModal} from '../ConfirmModal/ConfirmModal';
 
 type Props = ITask & {index: number};
 
 export const Task = ({task, complete, id, index}: Props) => {
   const dispatch = useDispatch();
-  const taskRef = useRef<HTMLTableRowElement>(null);
-  const nameTaskRef = useRef<HTMLTableDataCellElement>(null);
+  const editBtn = useRef<HTMLButtonElement>(null);
+  const [edit, setEdit] = useState(false);
+  const [taskValue, setTaskValue] = useState(task);
+  const [confirmModal, setConfirmModal] = useState(false);
+  const [deleteTask, setDeleteTask] = useState(false);
 
-  const handleClickDelete = (e: React.ChangeEvent<EventTarget>) => {
-    if (e.target instanceof HTMLButtonElement) {
-      e.preventDefault();
-      dispatch(removeTodo(e.target.dataset.id));
+  const handleClickEdit = (e: React.ChangeEvent<EventTarget>) => {
+    if (edit) {
+      setEdit(false);
+      dispatch(editTodo({id, task: taskValue}));
+      return;
     }
-  };
-
-  const handleClickComplete = (e: React.ChangeEvent<EventTarget>) => {
-    if (e.target instanceof HTMLButtonElement) {
-      e.preventDefault();
-      dispatch(completeTodo(e.target.dataset.id));
-    }
+    setEdit(true);
   };
 
   useEffect(() => {
-    if (taskRef.current && nameTaskRef.current) {
-      if (complete) {
-        taskRef.current.className = 'table-success';
-        nameTaskRef.current.className = 'text-decoration-line-through';
+    if (deleteTask) {
+      dispatch(removeTodo(id));
+    }
+  }, [deleteTask, dispatch, id]);
+
+
+  useEffect(() => {
+    if (editBtn.current instanceof HTMLButtonElement) {
+      if (!taskValue) {
+        editBtn.current.disabled = true;
         return;
       }
+      editBtn.current.disabled = false;
     }
-  }, [complete]);
+  }, [taskValue]);
 
   return (
-    <tr className="table-light" ref={taskRef}>
-      <td>{index}</td>
-      <td className="task" ref={nameTaskRef}>
-        {task}
-      </td>
-      <td>{complete ? 'Выполнена' : 'В процессе'}</td>
-      <td>
-        <Button
-          className="btn btn-danger"
-          data-id={id}
-          onClick={handleClickDelete}
-        >
-          Удалить
-        </Button>{' '}
-        <Button
-          className="btn btn-success"
-          data-id={id}
-          onClick={handleClickComplete}
-        >
-          Завершить
-        </Button>
-      </td>
-    </tr>
+    <>
+      <tr className={complete ? 'table-success' : "table-light"}>
+        <td>{index}</td>
+        {!edit ? (
+          <td className={complete ? 'text-decoration-line-through' : 'task'}>
+            {taskValue}
+          </td>
+        ) : (
+          <td>
+            <InputGroup>
+              <Form.Control
+                value={taskValue}
+                required
+                onChange={(e: React.ChangeEvent<EventTarget>) => {
+                  if (e.target instanceof HTMLInputElement) {
+                    setTaskValue(e.target.value);
+                  }
+                }}
+              />
+            </InputGroup>
+          </td>
+        )}
+        <td>{complete ? 'Выполнена' : 'В процессе'}</td>
+        <td>
+          <Button
+            ref={editBtn}
+            className="btn btn-secondary"
+            data-id={id}
+            onClick={handleClickEdit}
+          >
+            Редактировать
+          </Button>{' '}
+          <Button
+            className="btn btn-danger"
+            data-id={id}
+            onClick={() => {
+              setConfirmModal(true);
+            }}
+          >
+            Удалить
+          </Button>{' '}
+          <Button
+            className="btn btn-success"
+            data-id={id}
+            onClick={() => {
+              dispatch(completeTodo(id));
+            }}
+          >
+            Завершить
+          </Button>
+        </td>
+      </tr>
+      {confirmModal && <ConfirmModal setConfirmModal={setConfirmModal} setDeleteTask={setDeleteTask} />}
+    </>
   );
 };

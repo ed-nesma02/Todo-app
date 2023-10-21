@@ -18,7 +18,7 @@ const tasksSlice = createSlice({
   name: 'tasks',
   initialState,
   reducers: {
-    getTodo(state, action){
+    getTodo(state, action) {
       state.status = true;
       state.todoList = action.payload;
     },
@@ -42,8 +42,17 @@ const tasksSlice = createSlice({
         return task;
       });
     },
+    editTodo(state, action) {
+      state.todoList = state.todoList.map((task) => {
+        if (task.id === action.payload.id) {
+          task.task = action.payload.task;
+        }
+        return task;
+      });
+    },
   },
 });
 
 export default tasksSlice.reducer;
-export const {addTodo, removeTodo, completeTodo, getTodo} = tasksSlice.actions;
+export const {addTodo, removeTodo, completeTodo, getTodo, editTodo} =
+  tasksSlice.actions;

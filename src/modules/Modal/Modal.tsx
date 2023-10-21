@@ -4,9 +4,7 @@ import Modal from 'react-bootstrap/Modal';
 import {useDispatch} from 'react-redux';
 import { authLogin } from '../../store/auth/authReducer';
 
-type Props = {};
-
-export const ModalElement = (props: Props) => {
+export const ModalElement = () => {
   const [name, setName] = useState('');
   const dispatch = useDispatch();
 
